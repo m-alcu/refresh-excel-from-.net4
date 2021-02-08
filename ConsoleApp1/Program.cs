@@ -18,7 +18,7 @@ namespace RefreshDatabase
             Console.WriteLine("**********************************************");
             Console.WriteLine("**********************************************");
 
-            string configPath = Directory.GetCurrentDirectory() + "\\config.ini";
+            string configPath = AppDomain.CurrentDomain.BaseDirectory + "\\config.ini";
             PropertiesUtility properties = new PropertiesUtility();
             properties.LoadProperties(configPath);
 
@@ -27,9 +27,15 @@ namespace RefreshDatabase
             Console.WriteLine();
             int timeout = Int32.Parse(timeoutStr);
 
+            string pathList = properties.GetProperty("pathlist");
+            Console.WriteLine("Llista ubicada a: " + pathList + "Lista.xlsx");
+
+            string pathExcels = properties.GetProperty("pathexcels");
+            Console.WriteLine("Excels ubicats a: " + pathExcels + "*.*");
+
             Excel.Application application = new Excel.Application();
 
-            string path = Directory.GetCurrentDirectory()+ "\\Lista.xlsx";
+            string path = pathList + "Lista.xlsx";
             Excel.Workbook lista = application.Workbooks.Open(path);
             Excel.Worksheet mySheet = (Excel.Worksheet)lista.Sheets["Hojas"];
 
@@ -50,15 +56,15 @@ namespace RefreshDatabase
 
             for (int i = 0; i < numTerms; i++)
             {
-                Excel.Workbook workbook = application.Workbooks.Open(terms[i]);
+                Excel.Workbook workbook = application.Workbooks.Open(pathExcels+terms[i]);
                 workbook.RefreshAll();
-                Console.Write(i+1+". Actualitzant... "+ terms[i]);
+                Console.Write(i+1+". Actualitzant... "+ pathExcels+terms[i]);
                 System.Threading.Thread.Sleep(timeout);
                 Console.Write(" ok");
                 Console.WriteLine();
                 application.DisplayAlerts = false;
                 workbook.Save();
-                workbook.Close(false, terms[i], null);
+                workbook.Close(false, pathExcels+terms[i], null);
                 workbook = null;
             }
 
